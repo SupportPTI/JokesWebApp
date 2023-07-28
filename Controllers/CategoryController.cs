@@ -53,6 +53,7 @@ namespace JokesWebApp.Controllers
             {
                 _context.Add(_Category);
                 await _context.SaveChangesAsync();
+                TempData["success"] = "Category created successfully";
                 return RedirectToAction(nameof(Index));
             }      
             else
@@ -72,14 +73,18 @@ namespace JokesWebApp.Controllers
             {
                 return NotFound();
             }
-            Category result = _context.Category.Find(id);
+            Category? result =await _context.Category.Where(x => x.Id == id).FirstOrDefaultAsync();
+            if (result == null)
+                return NotFound();
+
+
             return View(result);
         }
 
 
         [AllowAnonymous]
         [HttpPost]
-        public async Task<IActionResult> Edit(Category _Category)
+        public async Task<IActionResult> Edit(Models.Category _Category)
         {
             if (_Category==null)
             {
@@ -94,6 +99,7 @@ namespace JokesWebApp.Controllers
                 {
                     _context.Update(_Category);
                     await _context.SaveChangesAsync();
+                    TempData["success"] = "Category edited successfully";
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -111,16 +117,69 @@ namespace JokesWebApp.Controllers
         }
 
 
-        [AllowAnonymous]
+
+
+        [Authorize]
         [HttpGet]
-        public async Task<IActionResult> Delete()
+        public async Task<IActionResult> Delete(int? id)
         {
-            return Ok();
+            if (id == null || id == 0)
+            {
+                return NotFound();
+            }
+            Category? result = await _context.Category.Where(x => x.Id == id).FirstOrDefaultAsync();
+            if (result == null)
+                return NotFound();
+
+
+            return View(result);
+
         }
 
-        [AllowAnonymous]
+
+
+        [Authorize]
+        [Route("/Category/Delete/{id}")]
+        [HttpPost, ActionName("Delete")]
+        public async Task<IActionResult> Delete(Models.Category _category)
+        {
+
+            if (_category == null)
+            {
+                return NotFound();
+            }
+
+
+                Category? Cat =await _context.Category.Where(x => x.Id == _category.Id).FirstOrDefaultAsync();
+                try
+                {
+                    if (Cat != null)
+                    {
+                        _context.Remove(Cat);
+                        await _context.SaveChangesAsync();
+                    TempData["success"] = "Category deleted successfully";
+                    }
+                }
+                catch (DbUpdateConcurrencyException)
+                {
+                    throw;
+                }
+
+
+                return RedirectToAction(nameof(Index));
+
+            
+
+
+
+
+        }
+
+
+
+        [Authorize]
         [HttpGet]
-        public async Task<IActionResult> ViewDetail()
+        public async Task<IActionResult> ViewDetail(Models.Category _Category)
         {
             return Ok();
         }
