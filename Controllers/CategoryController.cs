@@ -1,4 +1,5 @@
 ﻿using JokesWebApp.Data;
+using JokesWebApp.Interface;
 using JokesWebApp.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -41,15 +42,13 @@ namespace JokesWebApp.Controllers
         [Authorize]
         public async Task<IActionResult> Create(Models.Category _Category)
         {
-
             // ServerSide Validation
             if (_Category.Name == _Category.DisplayOrder.ToString())
             {
                 ModelState.AddModelError("Name","Input different name that is not same as Order number");
             
             }
-
-              
+             
              if(ModelState.IsValid)
             {
                 _context.Add(_Category);
@@ -66,10 +65,51 @@ namespace JokesWebApp.Controllers
 
         [AllowAnonymous]
         [HttpGet]
-        public async Task<IActionResult> Edit()
+        [Route("/Category/Edit/{id}")]
+        public async Task<IActionResult> Edit(int? id)
         {
-            return Ok();
+            if (id == null || id == 0)
+            {
+                return NotFound();
+            }
+            Category result = _context.Category.Find(id);
+            return View(result);
         }
+
+
+        [AllowAnonymous]
+        [HttpPost]
+        public async Task<IActionResult> Edit(Category _Category)
+        {
+            if (_Category==null)
+            {
+                return NotFound();
+            }
+
+
+            if (ModelState.IsValid)
+            {
+              
+                try
+                {
+                    _context.Update(_Category);
+                    await _context.SaveChangesAsync();
+                }
+                catch (DbUpdateConcurrencyException)
+                {
+                
+                   
+                        throw;
+                   
+                }
+                return RedirectToAction(nameof(Index));
+
+            }
+
+            return NotFound();
+
+        }
+
 
         [AllowAnonymous]
         [HttpGet]
