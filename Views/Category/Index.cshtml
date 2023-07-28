@@ -1,0 +1,50 @@
+﻿@model IEnumerable<JokesWebApp.Models.Category>;
+
+@{
+
+    int i = 0;
+
+}
+
+<div class="container ">
+      <div class="row pt-4">
+     <div class="col-6">
+      <h2 class="text-primary"> Category List</h2>
+      </div>
+        <div class="col-6 text-end">
+            <a asp-controller="Category" asp-action="Create" class="btn btn-primary">
+                <i class="bi bi-plus-circle-fill"></i>
+                CREATE NEW CATEGORY
+            </a>
+        </div>
+    </div>
+</div>
+
+
+<table class="table table-hover">
+    <thead >
+        <tr class="table-active text-center">
+        <th scope="col">Category Name</th>
+        <th scope="col">Display</th>
+        <th scope="col">Action</th>
+        </tr>
+    </thead>
+    @foreach (Category item in Model.OrderBy(x=> x.DisplayOrder))
+    {
+        <tr>
+            <th> @item.Name</th>
+            <th> @item.DisplayOrder</th>
+            <th>
+                <div class="w-75 btn-group">
+                    <a asp-controller="Category" asp-action="Edit" class="btn btn-primary"><i class="bi bi-pencil-square"></i> Edit</a>
+                    <a asp-controller="Category" asp-action="Delete" class="btn btn-danger"><i class="bi bi-trash3"></i> Delete</a>
+                    <a asp-controller="Category" asp-action="ViewDetail" class="btn btn-primary"><i class="bi bi-binoculars"></i> View</a>
+                </div>
+            </th>
+        </tr>
+      
+      
+    }
+
+
+</table>
